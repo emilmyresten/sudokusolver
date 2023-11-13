@@ -1,5 +1,7 @@
 type cell_content = Domain of int list | Guess of int | Final of int | Init
 
+let guess_count_ref = ref 0
+
 let inc a = a + 1
 
 let dec a = a - 1
@@ -214,6 +216,7 @@ let is_final full_board =
 	in aux 0 0 full_board
 
 let make_guess r c guess board = 
+	guess_count_ref := inc !guess_count_ref;
 	update_in_board r c (Guess guess) board
 	|> update_domains
 
@@ -245,6 +248,6 @@ let solve sudoko =
 		| _ when c = cols -> solver (inc r) 0 board
 		| _ -> board (* should never happen *)
 	in
-	update_domains sudoko
-	|> solver start_row start_col
-	|> print_board
+	let _ = update_domains sudoko |> solver start_row start_col |> print_board
+	in Format.printf "Found solution in %d guesses" !guess_count_ref; 
+		 guess_count_ref := 0;
